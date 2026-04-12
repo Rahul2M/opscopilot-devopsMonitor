@@ -1,142 +1,148 @@
 <!DOCTYPE html>
+
 <html>
 <head>
     <title>OpsCopilot</title>
 
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', sans-serif;
-            background: #0f172a;
-            color: #e2e8f0;
-        }
+```
+<style>
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', sans-serif;
+        background: #0f172a;
+        color: #e2e8f0;
+    }
 
-        .app {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
+    .app {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+    }
 
-        .header {
-            padding: 15px 20px;
-            background: #020617;
-            border-bottom: 1px solid #1e293b;
-            font-size: 18px;
-            font-weight: bold;
-        }
+    .header {
+        padding: 15px 20px;
+        background: #020617;
+        border-bottom: 1px solid #1e293b;
+        font-size: 18px;
+        font-weight: bold;
+    }
 
-        .chat {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-        }
+    .chat {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
 
-        .message {
-            margin-bottom: 20px;
-            max-width: 80%;
-        }
+    .message {
+        margin-bottom: 20px;
+        max-width: 80%;
+    }
 
-        .user {
-            align-self: flex-end;
-            background: #1e293b;
-            padding: 12px;
-            border-radius: 10px;
-        }
+    .user {
+        align-self: flex-end;
+        background: #1e293b;
+        padding: 12px;
+        border-radius: 10px;
+    }
 
-        .bot {
-            background: #020617;
-            padding: 15px;
-            border-radius: 10px;
-            border-left: 4px solid #3b82f6;
-        }
+    .bot {
+        background: #020617;
+        padding: 15px;
+        border-radius: 10px;
+        border-left: 4px solid #3b82f6;
+    }
 
-        .input-area {
-            display: flex;
-            flex-direction: column;
-            padding: 15px;
-            border-top: 1px solid #1e293b;
-            background: #020617;
-        }
+    .input-area {
+        display: flex;
+        flex-direction: column;
+        padding: 15px;
+        border-top: 1px solid #1e293b;
+        background: #020617;
+    }
 
-        .input-row {
-            display: flex;
-        }
+    .input-row {
+        display: flex;
+    }
 
-        textarea {
-            flex: 1;
-            padding: 10px;
-            border-radius: 8px;
-            border: none;
-            resize: none;
-            background: #1e293b;
-            color: white;
-            outline: none;
-        }
+    textarea {
+        flex: 1;
+        padding: 10px;
+        border-radius: 8px;
+        border: none;
+        resize: none;
+        background: #1e293b;
+        color: white;
+        outline: none;
+    }
 
-        button {
-            margin-left: 10px;
-            padding: 10px 15px;
-            background: #3b82f6;
-            border: none;
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-        }
+    button {
+        margin-left: 10px;
+        padding: 10px 15px;
+        background: #3b82f6;
+        border: none;
+        border-radius: 8px;
+        color: white;
+        cursor: pointer;
+    }
 
-        button:hover {
-            background: #2563eb;
-        }
+    button:hover {
+        background: #2563eb;
+    }
 
-        ul {
-            padding-left: 20px;
-        }
+    ul {
+        padding-left: 20px;
+    }
 
-        .severity {
-            padding: 4px 8px;
-            border-radius: 5px;
-            font-size: 12px;
-        }
+    .severity {
+        padding: 4px 8px;
+        border-radius: 5px;
+        font-size: 12px;
+    }
 
-        .HIGH { background: #ef4444; }
-        .MEDIUM { background: #f59e0b; }
-        .LOW { background: #22c55e; }
+    .HIGH { background: #ef4444; }
+    .MEDIUM { background: #f59e0b; }
+    .LOW { background: #22c55e; }
 
-        .error {
-            color: #ef4444;
-            margin-top: 5px;
-            display: none;
-        }
-    </style>
+    .error {
+        color: #ef4444;
+        margin-top: 5px;
+        display: none;
+    }
+</style>
+```
+
 </head>
 
 <body>
 
 <div class="app">
 
-    <div class="header">
-        ⚙️ OpsCopilot (DevOps AI Assistant)
+```
+<div class="header">
+    ⚙️ OpsCopilot (DevOps AI Assistant)
+</div>
+
+<div class="chat" id="chat"></div>
+
+<div class="input-area">
+    <div class="input-row">
+        <textarea 
+            id="logInput" 
+            placeholder="Paste logs here..." 
+            onkeydown="handleKey(event)"
+            oninput="clearError()">
+        </textarea>
+
+        <button onclick="analyze()">Send</button>
     </div>
 
-    <div class="chat" id="chat"></div>
-
-    <div class="input-area">
-        <div class="input-row">
-            <textarea 
-                id="logInput" 
-                placeholder="Paste logs here..." 
-                onkeydown="handleKey(event)"
-                oninput="clearError()">
-            </textarea>
-
-            <button onclick="analyze()">Send</button>
-        </div>
-
-        <div id="errorMsg" class="error">
-            ⚠️ Log input is required
-        </div>
+    <div id="errorMsg" class="error">
+        ⚠️ Log input is required
     </div>
+</div>
+```
 
 </div>
 
@@ -162,7 +168,7 @@ async function analyze() {
     const chat = document.getElementById("chat");
     const errorMsg = document.getElementById("errorMsg");
 
-    // 🔴 Validation
+    // Validation
     if (!log.trim()) {
         errorMsg.style.display = "block";
         logInput.style.border = "1px solid red";
@@ -183,41 +189,50 @@ async function analyze() {
     try {
         const response = await fetch("/api/analyze", {
             method: "POST",
-            headers: { "Content-Type": "text/plain" },
-            body: log
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ log: log })
         });
+
+        if (!response.ok) {
+            throw new Error("Server error: " + response.status);
+        }
 
         const data = await response.json();
 
-        // Add bot response
+        // SAFE handling
+        const fixSteps = data.fixSteps || [];
+        const preventionTips = data.preventionTips || [];
+
         const botMsg = document.createElement("div");
         botMsg.className = "message bot";
 
         botMsg.innerHTML = `
-            <b>Summary:</b> ${data.summary}<br><br>
-            <b>Root Cause:</b> ${data.rootCause}<br><br>
+            <b>Summary:</b> ${data.summary || "N/A"}<br><br>
+            <b>Root Cause:</b> ${data.rootCause || "N/A"}<br><br>
 
             <b>Fix Steps:</b>
-            <ul>${data.fixSteps.map(f => `<li>${f}</li>`).join("")}</ul>
+            <ul>${fixSteps.map(f => `<li>${f}</li>`).join("")}</ul>
 
             <b>Prevention:</b>
-            <ul>${data.preventionTips.map(p => `<li>${p}</li>`).join("")}</ul>
+            <ul>${preventionTips.map(p => `<li>${p}</li>`).join("")}</ul>
 
             <b>Severity:</b>
-            <span class="severity ${data.severity}">${data.severity}</span>
+            <span class="severity ${data.severity || "LOW"}">${data.severity || "LOW"}</span>
         `;
 
         chat.appendChild(botMsg);
 
-        // Auto scroll
         chat.scrollTop = chat.scrollHeight;
-
-        // Focus back
         logInput.focus();
 
     } catch (error) {
-        alert("Error connecting to backend!");
         console.error(error);
+
+        const botMsg = document.createElement("div");
+        botMsg.className = "message bot";
+        botMsg.innerHTML = `<b>⚠️ Error:</b> Unable to process request. Please try again.`;
+
+        chat.appendChild(botMsg);
     }
 }
 </script>
