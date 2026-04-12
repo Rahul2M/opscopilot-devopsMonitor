@@ -181,7 +181,7 @@ async function analyze() {
     logInput.value = "";
 
     try {
-        const response = await fetch("http://localhost:8080/api/analyze", {
+        const response = await fetch("/api/analyze", {
             method: "POST",
             headers: { "Content-Type": "text/plain" },
             body: log
