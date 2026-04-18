@@ -1,8 +1,10 @@
 package com.opscopilot.backend.controller;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +13,7 @@ import com.opscopilot.backend.model.AnalysisResponse;
 import com.opscopilot.backend.model.Rule;
 import com.opscopilot.backend.service.AiAnalysisService;
 import com.opscopilot.backend.service.RuleEngineService;
+import com.opscopilot.backend.service.LogFileService;
 
 @RestController
 @RequestMapping("/api")
@@ -23,12 +26,16 @@ public class LogController {
     @Autowired
     private AiAnalysisService aiService;
 
+    @Autowired
+    private LogFileService logFileService;
+
+    // 🔹 Existing API (Manual Input)
     @PostMapping("/analyze")
     public AnalysisResponse analyzeLog(@RequestBody Map<String, String> request) {
 
         String log = request.get("log");
 
-        // 🔴 Safety check
+        // Safety check
         if (log == null || log.trim().isEmpty()) {
             return buildErrorResponse();
         }
@@ -40,6 +47,30 @@ public class LogController {
         }
 
         return aiService.analyzeWithAI(log);
+    }
+
+    // 🔥 NEW API (Log File Integration)
+    @GetMapping("/logs/analyze")
+    public List<AnalysisResponse> analyzeLogsFromFile() throws IOException {
+
+        List<String> logs = logFileService.readLogs();
+
+        List<AnalysisResponse> responses = new ArrayList<>();
+
+        for (String log : logs) {
+
+            if (log == null || log.trim().isEmpty()) continue;
+
+            Optional<Rule> rule = ruleEngine.matchRule(log);
+
+            if (rule.isPresent()) {
+                responses.add(convertRuleToResponse(rule.get()));
+            } else {
+                responses.add(aiService.analyzeWithAI(log));
+            }
+        }
+
+        return responses;
     }
 
     private AnalysisResponse convertRuleToResponse(Rule rule) {

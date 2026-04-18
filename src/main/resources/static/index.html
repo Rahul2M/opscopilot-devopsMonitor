@@ -91,6 +91,15 @@
         background: #2563eb;
     }
 
+    .secondary-btn {
+        margin-top: 10px;
+        background: #10b981;
+    }
+
+    .secondary-btn:hover {
+        background: #059669;
+    }
+
     ul {
         padding-left: 20px;
     }
@@ -138,6 +147,11 @@
         <button onclick="analyze()">Send</button>
     </div>
 
+    <!-- 🔥 NEW BUTTON -->
+    <button class="secondary-btn" onclick="analyzeSystemLogs()">
+        Analyze System Logs
+    </button>
+
     <div id="errorMsg" class="error">
         ⚠️ Log input is required
     </div>
@@ -155,30 +169,21 @@ function handleKey(event) {
 }
 
 function clearError() {
-    const errorMsg = document.getElementById("errorMsg");
-    const logInput = document.getElementById("logInput");
-
-    errorMsg.style.display = "none";
-    logInput.style.border = "none";
+    document.getElementById("errorMsg").style.display = "none";
 }
 
+// 🔹 Existing manual analyze
 async function analyze() {
     const logInput = document.getElementById("logInput");
     const log = logInput.value;
     const chat = document.getElementById("chat");
     const errorMsg = document.getElementById("errorMsg");
 
-    // Validation
     if (!log.trim()) {
         errorMsg.style.display = "block";
-        logInput.style.border = "1px solid red";
         return;
-    } else {
-        errorMsg.style.display = "none";
-        logInput.style.border = "none";
     }
 
-    // Add user message
     const userMsg = document.createElement("div");
     userMsg.className = "message user";
     userMsg.innerText = log;
@@ -193,47 +198,67 @@ async function analyze() {
             body: JSON.stringify({ log: log })
         });
 
-        if (!response.ok) {
-            throw new Error("Server error: " + response.status);
-        }
-
         const data = await response.json();
+        appendBotResponse(chat, data);
 
-        // SAFE handling
-        const fixSteps = data.fixSteps || [];
-        const preventionTips = data.preventionTips || [];
-
-        const botMsg = document.createElement("div");
-        botMsg.className = "message bot";
-
-        botMsg.innerHTML = `
-            <b>Summary:</b> ${data.summary || "N/A"}<br><br>
-            <b>Root Cause:</b> ${data.rootCause || "N/A"}<br><br>
-
-            <b>Fix Steps:</b>
-            <ul>${fixSteps.map(f => `<li>${f}</li>`).join("")}</ul>
-
-            <b>Prevention:</b>
-            <ul>${preventionTips.map(p => `<li>${p}</li>`).join("")}</ul>
-
-            <b>Severity:</b>
-            <span class="severity ${data.severity || "LOW"}">${data.severity || "LOW"}</span>
-        `;
-
-        chat.appendChild(botMsg);
-
-        chat.scrollTop = chat.scrollHeight;
-        logInput.focus();
-
-    } catch (error) {
-        console.error(error);
-
-        const botMsg = document.createElement("div");
-        botMsg.className = "message bot";
-        botMsg.innerHTML = `<b>⚠️ Error:</b> Unable to process request. Please try again.`;
-
-        chat.appendChild(botMsg);
+    } catch (err) {
+        appendError(chat);
     }
+
+    chat.scrollTop = chat.scrollHeight;
+}
+
+// 🔥 NEW: System log analysis
+async function analyzeSystemLogs() {
+    const chat = document.getElementById("chat");
+
+    try {
+        const response = await fetch("/api/logs/analyze");
+        const dataList = await response.json();
+
+        dataList.forEach(data => {
+            appendBotResponse(chat, data);
+        });
+
+    } catch (err) {
+        appendError(chat);
+    }
+
+    chat.scrollTop = chat.scrollHeight;
+}
+
+// 🔹 Reusable response renderer
+function appendBotResponse(chat, data) {
+
+    const fixSteps = data.fixSteps || [];
+    const preventionTips = data.preventionTips || [];
+
+    const botMsg = document.createElement("div");
+    botMsg.className = "message bot";
+
+    botMsg.innerHTML = `
+        <b>Summary:</b> ${data.summary || "N/A"}<br><br>
+        <b>Root Cause:</b> ${data.rootCause || "N/A"}<br><br>
+
+        <b>Fix Steps:</b>
+        <ul>${fixSteps.map(f => `<li>${f}</li>`).join("")}</ul>
+
+        <b>Prevention:</b>
+        <ul>${preventionTips.map(p => `<li>${p}</li>`).join("")}</ul>
+
+        <b>Severity:</b>
+        <span class="severity ${data.severity || "LOW"}">${data.severity || "LOW"}</span>
+    `;
+
+    chat.appendChild(botMsg);
+}
+
+// 🔹 Error handler
+function appendError(chat) {
+    const botMsg = document.createElement("div");
+    botMsg.className = "message bot";
+    botMsg.innerHTML = `<b>⚠️ Error:</b> Unable to process request`;
+    chat.appendChild(botMsg);
 }
 </script>
 
