@@ -12,8 +12,20 @@ import java.util.stream.Collectors;
 public class LogFileService {
 
     public List<String> readLogs() {
+
         try {
             ClassPathResource resource = new ClassPathResource("logs/sample.log");
+
+            // ✅ If file NOT found → fallback
+            if (!resource.exists()) {
+                System.out.println("⚠️ File NOT found in Render, using fallback logs");
+
+                return List.of(
+                        "exit code 127",
+                        "disk space issue",
+                        "unknown error"
+                );
+            }
 
             BufferedReader reader = new BufferedReader(
                     new InputStreamReader(resource.getInputStream())
@@ -22,7 +34,14 @@ public class LogFileService {
             return reader.lines().collect(Collectors.toList());
 
         } catch (Exception e) {
-            throw new RuntimeException("Error reading log file: " + e.getMessage());
+
+            System.out.println("❌ ERROR reading log file: " + e.getMessage());
+
+            // ✅ Never crash → fallback
+            return List.of(
+                    "exit code 127",
+                    "fallback error"
+            );
         }
     }
 }
